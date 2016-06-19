@@ -20,7 +20,7 @@ class YoutubeHelper(object):
 	    o Created a Google account
 	    o Went to Google Console:
 	      https://console.cloud.google.com/
-	      At https://console.cloud.google.com/start: created a project
+	    o Created a project at https://console.cloud.google.com/start.
 	        Ex: mooc-analytics
 	    o On the same page: Enabled APIs: 'Enable YouTube Data API'
 	    o Obtained an API key:
@@ -33,7 +33,9 @@ class YoutubeHelper(object):
     '''
 
     # Video info clients can ask for, and the necessary
-    # fields definitions as understood by the YouTube API V3:
+    # fields definitions as understood by the YouTube API V3.
+    # To extend, just add key-value pairs:
+    
     video_info_names = {
                         'channelTitle' : 'snippet/channelTitle', 
                         'videoTitle'   : 'snippet/title',
@@ -114,6 +116,37 @@ class YoutubeHelper(object):
     #---------
     
     def get_video_info(self, param_arr, video_id, referer=None):
+        '''
+        Retrieve selected information about a video, given the
+        YouTube video ID. For available info, see the video_info_names
+        dict class variable. For example, the videoTitle will retrieve
+        the video's title, while pubDate will retrieve the publication
+        data of the video. 
+        
+        Example:
+              get_video_info([videoTitle, captionsAvailable, duration], 'Hlfeeqf5tdc')
+          returns:
+              {'videoTitle' : 'Unit 1 Module 5 part 1',
+               'captionsAvailable' : 'true',
+               'duration' : timedelta(seconds=662.0)
+               }
+               
+        Note that booleans are returned as the API provides them: as
+        strings 'true' and 'false. The only return value that is treated
+        specially is 'duration'. It returns a Python timedelta instance.
+        Callers can obtain a user-readable string (H:MM:SS) via str(duration), or
+        the number of seconds as duration.total_seconds().               
+        
+        :param param_arr: individual result field, or array of multiple fields
+        :type param_arr: { str | [str] }
+        :param video_id: YouTube id of video
+        :type video_id: str
+        :param referer: one of the referer strings associated with the API
+        :type referer: str
+        :returns dictionary of results
+        :rtype { str : str }, except for duration, which returns { str : timedelta }
+        :raise ValueError if no referer found, or if requested return field does not exist.
+        '''
         
         if len(param_arr) == 0:
             return None
@@ -186,9 +219,6 @@ class YoutubeHelper(object):
                 user_res_dict[user_name] = user_res_value
         return(user_res_dict)
             
-         
- 
-        
     
     #--------------------------------- Private Utility Methods ------------    
         
@@ -225,8 +255,6 @@ class YoutubeHelper(object):
 if __name__ == '__main__':
     
     service = YoutubeHelper(referer='mooc-analyzer')
-    #***dur = service.get_duration('hlFeEQF5tDc')
-    #***print('Video duration: %s (%s seconds)' % (str(dur), dur.total_seconds()))
-    service.get_video_info()
+    print(service.get_video_info(['duration', 'videoTitle'], 'hlFeEQF5tDc'))
             
                 
