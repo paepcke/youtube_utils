@@ -31,12 +31,6 @@ class YouTubeUtilsTest(unittest.TestCase):
         pass
 
     @skipIf (not DO_ALL, 'Temporarily skipping this test')
-    def test_duration(self):
-        dur = self.service.get_duration(self.test_vid_id)
-        self.assertEqual('0:11:02', str(dur))
-        self.assertEqual(662.0, dur.total_seconds())
-
-    @skipIf (not DO_ALL, 'Temporarily skipping this test')
     def test_get_video_info_one_snippet_item(self):
         res = self.service.get_video_info(['channelTitle'], self.test_vid_id)
         self.assertDictEqual({'channelTitle': u'StatsSpring2013'}, res)

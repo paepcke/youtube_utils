@@ -66,51 +66,7 @@ class YoutubeHelper(object):
 
     #--------------------------------- Public Methods ------------    
 
-    #-----------------------
-    # get_duration
-    #---------
-
-    def get_duration(self, video_id, referer=None):
-        '''
-        Given a video ID, such as 'hlFeEQF5tDc', return
-        a Python timedelta instance D. Caller can get
-        seconds via D.total_seconds(), or a string of
-        the form H:MM:SS via str(D).
-        
-        :param video_id: YouTube video ID
-        :type video_id: str
-        :param referer: Referer for which the API was authorized.           
-        :type referer: str
-        :return timedelta instance with the video duration.
-        :rtype timedelta
-        :raise ValueError if referer or key not found.
-               IOError if YouTube service returned an error.
-        '''
-        if referer is None:
-            if self.referer is not None:
-                referer = self.referer
-            else:
-                raise ValueError('Must specify referer ID in __init__() call or in calling this method.')
-        req = self.service.videos().list(part='contentDetails',
-				                         id=video_id,
-                                         fields='items(contentDetails/duration)',
-				                         key=self.api_key)
-        req.headers['referer'] = referer
-        try:
-            res = req.execute()
-        except HttpError as e:
-            raise IOError('Could not retrieve video duration: %s' % self.msg_from_http_error(e)) 
-
-        # If all went well, we got something like
-        #    {u'items': [{u'contentDetails': {u'duration': u'PT11M2S'}}]}
-        
-        iso8601_duration = res['items'][0]['contentDetails']['duration'] 
-
-        # Turn PT11M2S into a Python timedelta instance:     
-        time_delta = isodate.parse_duration(iso8601_duration)
-        return time_delta
-    
-    
+  
     #-----------------------
     # get_video_info
     #---------
