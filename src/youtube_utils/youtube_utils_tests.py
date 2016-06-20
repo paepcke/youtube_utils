@@ -13,7 +13,7 @@ from datetime import timedelta
 #       a referer 'youtube_utils-testing'. Then change
 #       the api_key in the setUp() method below.
 
-DO_ALL = True
+DO_ALL = False
 
 class YouTubeUtilsTest(unittest.TestCase):
 
@@ -40,7 +40,7 @@ class YouTubeUtilsTest(unittest.TestCase):
         res = self.service.get_video_info(['captionsAvailable'], self.test_vid_id)
         self.assertDictEqual({'captionsAvailable':'true'}, res)
         
-    #@skipIf (not DO_ALL, 'Temporarily skipping this test')
+    @skipIf (not DO_ALL, 'Temporarily skipping this test')
     def test_get_video_info_multiple_snippet_items(self):
         res = self.service.get_video_info(['channelTitle', 'videoTitle'], self.test_vid_id)
         self.assertDictEqual({'channelTitle' : 'StatsSpring2013',
@@ -66,10 +66,31 @@ class YouTubeUtilsTest(unittest.TestCase):
 
     @skipIf (not DO_ALL, 'Temporarily skipping this test')
     def test_user_name_from_api_name(self):
-        #res = self.service.get_video_info(['channelTitle', 'videoTitle', 'captionsAvailable', 'duration'], self.test_vid_id)
         self.assertEqual('channelTitle', self.service.user_name_from_api_name('snippet/channelTitle'))
         self.assertEqual('captionsAvailable', self.service.user_name_from_api_name('contentDetails/caption'))
         self.assertRaises(ValueError, self.service.user_name_from_api_name, 'foobar')
+
+    @skipIf (not DO_ALL, 'Temporarily skipping this test')
+    def test_get_caption_file_ids(self):
+        res = self.service.get_caption_file_ids(self.test_vid_id)
+        self.assertListEqual(['vXlAeY5R6WE56Q3S2cb9b3agjQid8jSC-lwrvGWboh0=',
+                              '5-c6BoK6O8gJmY_liC5y-YRPso9GpV47'
+                              ], res
+                             )
+
+    @skipIf (not DO_ALL, 'Temporarily skipping this test')
+    def test_get_caption_files(self):
+        
+        #res = self.service.get_caption_files(self.test_vid_id)
+        res = self.service.get_caption_files('QYDuAo9r1xE')
+        print(res)
+
+    #@skipIf (not DO_ALL, 'Temporarily skipping this test')
+    def test_search_metadata(self):
+        #****res = self.service.search_metadata('data-modification-statements')
+        res = self.service.search_metadata('data-modification-statements', return_fields='videoTitle')
+        print res
+
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
