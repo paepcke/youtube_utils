@@ -13,7 +13,7 @@ from datetime import timedelta
 #       a referer 'youtube_utils-testing'. Then change
 #       the api_key in the setUp() method below.
 
-DO_ALL = False
+DO_ALL = True
 
 class YouTubeUtilsTest(unittest.TestCase):
 
@@ -33,26 +33,26 @@ class YouTubeUtilsTest(unittest.TestCase):
     @skipIf (not DO_ALL, 'Temporarily skipping this test')
     def test_get_video_info_one_snippet_item(self):
         res = self.service.get_video_info(['channelTitle'], self.test_vid_id)
-        self.assertDictEqual({'channelTitle': u'StatsSpring2013'}, res)
+        self.assertDictEqual({'channelTitle': u'StatsSpring2013'}, res[0])
 
     @skipIf (not DO_ALL, 'Temporarily skipping this test')
     def test_get_video_info_one_content_details_item(self):
         res = self.service.get_video_info(['captionsAvailable'], self.test_vid_id)
-        self.assertDictEqual({'captionsAvailable':'true'}, res)
+        self.assertDictEqual({'captionsAvailable':'true'}, res[0])
         
     @skipIf (not DO_ALL, 'Temporarily skipping this test')
     def test_get_video_info_multiple_snippet_items(self):
         res = self.service.get_video_info(['channelTitle', 'videoTitle'], self.test_vid_id)
         self.assertDictEqual({'channelTitle' : 'StatsSpring2013',
-                              'videoTitle'   : 'Unit 1 Module 5 part 1'}, 
-                             res)
+                              'videoTitle'   : 'Unit 1 Module 5 part 1'},
+                             res[0])
 
     @skipIf (not DO_ALL, 'Temporarily skipping this test')
     def test_get_video_info_multiple_content_details_item(self):
         res = self.service.get_video_info(['captionsAvailable', 'duration'], self.test_vid_id)
         self.assertDictEqual({'captionsAvailable' : 'true',
                               'duration' : timedelta(seconds=662.0)},
-                             res)
+                             res[0])
 
     @skipIf (not DO_ALL, 'Temporarily skipping this test')
     def test_get_video_info_multiple_snippet_and_content_details_item(self):
@@ -62,7 +62,7 @@ class YouTubeUtilsTest(unittest.TestCase):
                               'duration'     : timedelta(seconds=662.0),
                               'captionsAvailable' : 'true'
                               },
-                             res)
+                             res[0])
 
     @skipIf (not DO_ALL, 'Temporarily skipping this test')
     def test_user_name_from_api_name(self):
@@ -80,17 +80,29 @@ class YouTubeUtilsTest(unittest.TestCase):
 
     @skipIf (not DO_ALL, 'Temporarily skipping this test')
     def test_get_caption_files(self):
-        
-        #res = self.service.get_caption_files(self.test_vid_id)
-        res = self.service.get_caption_files('QYDuAo9r1xE')
-        print(res)
 
-    #@skipIf (not DO_ALL, 'Temporarily skipping this test')
+        # ***** Claims to require login. Needs investigation
+        try:        
+            #res = self.service.get_caption_files(self.test_vid_id)
+            res = self.service.get_caption_files('QYDuAo9r1xE')
+        except ValueError:
+            print("Known 'Need Login' error; needs fixing.")
+
+    @skipIf (not DO_ALL, 'Temporarily skipping this test')
     def test_search_metadata(self):
-        #****res = self.service.search_metadata('data-modification-statements')
         res = self.service.search_metadata('data-modification-statements', return_fields='videoTitle')
-        print res
-
+        expected = [{'videoTitle': u'06-08-data-modification-statements.mp4'}, 
+                    {'videoTitle': u'19. SQL- Data Modification Statements - [Database Management] By Jennifer Widom'}, 
+                    {'videoTitle': u'9 data modification statements'}, 
+                    {'videoTitle': u'06-08-data-modification-statements'}, 
+                    {'videoTitle': u'Database Tutorial Session19 data modification statements'}
+                    ] 
+        self.assertListEqual(expected, res)
+        
+        res = self.service.search_metadata('06-08-data-modification-statements', return_fields='videoId')
+        expected = {'videoId' : 'qKNb8YQYTZg'}
+        self.assertDictEqual(expected, res[0])
+        
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

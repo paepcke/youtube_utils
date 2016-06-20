@@ -345,19 +345,22 @@ class YoutubeHelper(object):
         :return dict of keys from video_info_names.keys() mapping to result values.
         :rtype { str : str }
         '''    
-        api_res_dict = res['items'][0]
-        user_res_dict = {}
-        for api_name_root in api_res_dict.keys():
-            for api_name_leaf in api_res_dict[api_name_root].keys():
-                api_name = '/'.join([api_name_root, api_name_leaf])
-                user_name = self.user_name_from_api_name(api_name)
-                user_res_value = api_res_dict[api_name_root][api_name_leaf]
-            # Handle 'duration' specially: turn into a timedelta object:
-                if user_name == 'duration':
-                    user_res_value = isodate.parse_duration(user_res_value)
-                user_res_dict[user_name] = user_res_value
         
-        return user_res_dict
+        res_dicts = []
+        for api_res_dict in res['items']:
+            user_res_dict = {}
+            for api_name_root in api_res_dict.keys():
+                for api_name_leaf in api_res_dict[api_name_root].keys():
+                    api_name = '/'.join([api_name_root, api_name_leaf])
+                    user_name = self.user_name_from_api_name(api_name)
+                    user_res_value = api_res_dict[api_name_root][api_name_leaf]
+                # Handle 'duration' specially: turn into a timedelta object:
+                    if user_name == 'duration':
+                        user_res_value = isodate.parse_duration(user_res_value)
+                    user_res_dict[user_name] = user_res_value
+            res_dicts.append(user_res_dict)
+        
+        return res_dicts
         
     #-----------------------
     # msg_from_http_error
